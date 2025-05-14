@@ -34,28 +34,9 @@ None. This is a standalone role. If you wish to integrate with other roles (e.g.
 ```yaml
 - hosts: logging
   become: true
-
-  vars:
-    filebeat_version: "7.17.3"
-    elastic_hosts:
-      - "es1.example.com:9200"
-      - "es2.example.com:9200"
-    index_name: "logs-%{+yyyy.MM.dd}"
-    template_name: "logs"
-    template_pattern: "logs-*"
-    kibana_host: "https://kibana.example.com:5601"
-
   roles:
-    - shmador.ansible-filebeat-role
+    - ansible-filebeat-role
 ```
-
-This will:
-
-1. Add Elastic’s APT key and repo  
-2. Install Filebeat version 7.17.3  
-3. Deploy `/etc/filebeat/filebeat.yml` with your custom index and template settings  
-4. Restart Filebeat whenever the template or index pattern changes  
-
 ## License
 
 BSD  
