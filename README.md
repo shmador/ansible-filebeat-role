@@ -1,38 +1,68 @@
-Role Name
-=========
+# ansible-filebeat-role
 
-A brief description of the role goes here.
+A role to install, configure, and manage Filebeat (the Elastic log shipper) on Debian-based hosts. It installs the package from Elastic’s APT repo, deploys a custom `filebeat.yml` (with date-stamped indices by default), and handles service restarts whenever the config changes.
 
-Requirements
-------------
+## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- Ansible 2.9+  
+- Debian-family Linux (uses `apt_key`, `apt_repository`, `apt`)  
+- Network access to the Elastic APT repository and Elasticsearch hosts  
+- (Optional) A running Kibana instance if you enable dashboard loading  
 
-Role Variables
---------------
+## Role Variables
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+All variables have sensible defaults in `defaults/main.yml`, but can be overridden:
 
-Dependencies
-------------
+| Variable              | Default                                                                                   | Description                                                                                        |
+|-----------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| `filebeat_version`    | `"7.17.0"`                                                                                | The Filebeat package version to install.                                                          |
+| `log_paths`           | `["/var/log/*.log"]`                                                                      | List of paths for Filebeat to harvest.                                                            |
+| `elastic_apt_repo`    | `"deb https://artifacts.elastic.co/packages/7.x/apt stable main"`                         | URL for the Elastic APT repository (vars/main.yml).                                                |
+| `elastic_gpg_key_url` | `"https://artifacts.elastic.co/GPG-KEY-elasticsearch"`                                    | URL for the Elastic GPG key.                                                                       |
+| `elastic_hosts`       | `["51.17.138.28:9200", "51.84.12.187:9200", "51.17.8.194:9200"]`                           | List of Elasticsearch hosts.                                                                       |
+| `index_name`          | `"index-%{+yyyy.MM.dd}"`                                                                  | Index name pattern (used when ILM is disabled).                                                   |
+| `template_name`       | `"index"`                                                                                 | Name of the Elasticsearch index template.                                                          |
+| `template_pattern`    | `"index-*"`                                                                               | Index template pattern.                                                                            |
+| `kibana_host`         | `"http://51.17.8.194:5601"`                                                               | URL of the Kibana instance (for dashboard loading).                                                |
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Dependencies
 
-Example Playbook
-----------------
+None. This is a standalone role. If you wish to integrate with other roles (e.g. an Elasticsearch or Kibana role), be sure to configure `elastic_hosts` and `kibana_host` accordingly in your playbook.
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+## Example Playbook
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```yaml
+- hosts: logging
+  become: true
 
-License
--------
+  vars:
+    filebeat_version: "7.17.3"
+    elastic_hosts:
+      - "es1.example.com:9200"
+      - "es2.example.com:9200"
+    index_name: "logs-%{+yyyy.MM.dd}"
+    template_name: "logs"
+    template_pattern: "logs-*"
+    kibana_host: "https://kibana.example.com:5601"
 
-BSD
+  roles:
+    - shmador.ansible-filebeat-role
+```
 
-Author Information
-------------------
+This will:
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+1. Add Elastic’s APT key and repo  
+2. Install Filebeat version 7.17.3  
+3. Deploy `/etc/filebeat/filebeat.yml` with your custom index and template settings  
+4. Restart Filebeat whenever the template or index pattern changes  
+
+## License
+
+BSD  
+
+## Author Information
+
+- **Shmador** – [GitHub](https://github.com/shmador)  
+- **Dor** – Maintainer of the Elastic Ansible collection on GitHub  
+
+Feel free to open issues or submit pull requests on the [role’s GitHub page](https://github.com/shmador/ansible-filebeat-role) for improvements or bug reports.
