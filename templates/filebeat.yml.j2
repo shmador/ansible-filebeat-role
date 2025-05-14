@@ -1,0 +1,36 @@
+# Filebeat Inputs
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+{% for path in log_paths %}
+      - {{ path }}
+{% endfor %}
+
+# Elasticsearch Output
+output.elasticsearch:
+  hosts:
+{% for host in elastic_hosts %}
+    - "{{ host }}"
+{% endfor %}
+  index: {{ index_name }}
+
+# Disable ILM
+setup.ilm.enabled: false
+
+# Setup Template
+setup.template.name: {{ template_name }}
+setup.template.pattern: {{ template_pattern }}
+
+# Logging
+logging:
+  level: info
+  to_files: true
+  files:
+    path: /var/log/filebeat
+    name: filebeat
+    rotateeverybytes: 10485760  # 10MB
+    keepfiles: 7
+
+# Kibana Host
+setup.kibana.host: {{ kibana_host }}

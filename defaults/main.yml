@@ -1,0 +1,13 @@
+filebeat_version: "7.17.0"
+log_paths:
+  - /var/log/*.log
+elastic_hosts:
+  - "51.17.138.28:9200"
+  - "51.84.12.187:9200"
+  - "51.17.8.194:9200"
+# Index
+index_name: "index-%{+yyyy.MM.dd}"
+template_name: "index"
+template_pattern: "index-*"
+# Kibana
+kibana_host: "http://51.17.8.194:5601"

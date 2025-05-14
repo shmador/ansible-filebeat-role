@@ -1,0 +1,29 @@
+---
+# tasks file for filebeat
+- name: Ensure Elastic GPG key is present
+  apt_key:
+    url: "{{ elastic_gpg_key_url }}"
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Add Elastic APT repo
+  apt_repository:
+    repo: "{{ elastic_apt_repo }}"
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Install Filebeat package
+  apt:
+    name: "filebeat={{ filebeat_version }}"
+    state: present
+    update_cache: yes
+  when: ansible_os_family == 'Debian'
+
+- name: Deploy Filebeat config
+  template:
+    src: filebeat.yml.j2
+    dest: /etc/filebeat/filebeat.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart filebeat

@@ -1,0 +1,4 @@
+---
+# vars file for filebeat
+elastic_apt_repo: "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+elastic_gpg_key_url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
