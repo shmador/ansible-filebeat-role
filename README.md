@@ -44,6 +44,5 @@ BSD
 ## Author Information
 
 - **Shmador** – [GitHub](https://github.com/shmador)  
-- **Dor** – Maintainer of the Elastic Ansible collection on GitHub  
 
 Feel free to open issues or submit pull requests on the [role’s GitHub page](https://github.com/shmador/ansible-filebeat-role) for improvements or bug reports.
